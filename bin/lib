@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# need
+#    export ROOT
+#    export JQ
+#    export SCREEN
+
+function make_start(){
+    SID=$1
+    EXEC=$2
+
+    INS=`ps aux | grep $SID | grep -v grep`
+
+    if [ -z "$INS" ]
+    then
+        echo 'Start'
+        $SCREEN -dmS $SID bash $EXEC
+    else
+        echo 'Allready started'
+    fi
+
+}
+
+function make_stop(){
+    SID=$1
+
+    INS=`ps aux | grep $SID | grep -v grep`
+
+    if [ -n "$INS" ]
+    then
+        echo 'Stop'
+        PID=`echo $INS | awk '{print $2}'`
+        kill $PID
+    else
+        echo 'Allready stoped'
+    fi
+}
+
+function make_restart(){
+    SID=$1
+    EXEC=$2
+
+    make_stop $SID && make_start $SID $EXEC
+}
+
+function make_exec(){
+    while ((i++)); read flylist; do
+        ID=`echo $flylist | $JQ '.name'  | sed 's/\"//g'`
+        echo -----------------------
+        echo $ID
+
+        ENABLE=`echo $flylist | $JQ '.enable'`
+
+        MINER=`echo $flylist | $JQ '.miner'`
+        MINERA=`cat $ROOT/conf/miners.json | $JQ .$MINER`
+
+        WALLET=`echo $flylist | $JQ '.wallet'`
+        WALLET=`cat $ROOT/conf/wallets.json | $JQ .$WALLET |  $JQ '.wallet' | sed 's/\"//g'`
+
+        SID='SCR_COIN_'$i
+        EXEC=$ROOT/execs/$i.bash
+
+        MD1=`md5sum $EXEC | awk '{print $1}'`
+
+        echo '#!/bin/bash'							>  $EXEC
+        echo 									>> $EXEC
+        echo 'cd '$ROOT'/miners/'`echo $MINERA | $JQ '.folder' | sed 's/\"//g'`	>> $EXEC
+        echo 									>> $EXEC
+        echo 'INDEX='$i								>> $EXEC
+        echo 'INI='$ROOT/execs/$i.ini						>> $EXEC
+        echo 'NAME='`cat $ROOT/conf/rig.json | $JQ '.name' | sed 's/\"//g'`	>> $EXEC
+        echo 'EMAIL='`cat $ROOT/conf/rig.json | $JQ '.email' | sed 's/\"//g'`	>> $EXEC
+        echo 'COIN='`echo $flylist | $JQ '.coin' | sed 's/\"//g'`		>> $EXEC
+        echo 'WALLET='$WALLET							>> $EXEC
+        echo 'IP='`echo $flylist | $JQ '.ip' | sed 's/\"//g'`			>> $EXEC
+        echo 'PORT='`echo $flylist | $JQ '.port' | sed 's/\"//g'`		>> $EXEC
+        echo 'DEVICES='`echo $flylist | $JQ '.devices' | sed 's/\"//g'`		>> $EXEC
+        echo 									>> $EXEC
+
+        echo $MINERA | $JQ '.exec' | $JQ -c '.[]' | while read -r rec
+        do
+            echo $rec  | sed 's/\"//g' >> $EXEC
+        done
+        MD2=`md5sum $EXEC | awk '{print $1}'`
+
+        chmod 700 $EXEC
+
+        if [ $ENABLE == 'true' ]
+        then
+            if [ -e "$ROOT/flg/$ID.restart" ]
+            then
+                echo 'Restart by flag'
+                rm -f $ROOT/flg/$ID.restart
+                make_restart $SID $EXEC
+            else
+                if [ "$MD1" != "$MD2" ]
+                then
+                    echo 'Restart by change fly file'
+                    make_restart $SID $EXEC
+                else
+                    make_start $SID $EXEC
+                fi
+            fi
+        else
+            make_stop $SID
+        fi
+
+    done
+}

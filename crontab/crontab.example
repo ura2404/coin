@@ -1,0 +1,1 @@
+* * * * * cd ~/coin && bash start.bash > /dev/null 2>/dev/null
