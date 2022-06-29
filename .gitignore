@@ -3,3 +3,4 @@ flg/*
 tmp/*
 miners/*
 exec/*
+!.gitkeep
