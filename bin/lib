@@ -44,9 +44,12 @@ function make_restart(){
 }
 
 function make_exec(){
+    echo '----------------------------------------'
+    echo 'Check flylists'
+
     while ((i++)); read flylist; do
         ID=`echo $flylist | $JQ '.name'  | sed 's/\"//g'`
-        echo -----------------------
+        echo '----------------------------------------'
         echo $ID
 
         ENABLE=`echo $flylist | $JQ '.enable'`

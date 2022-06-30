@@ -12,5 +12,5 @@ Coin project for debian based system
 
 For restart
 ```
-touch $ROOT/flg/<nfly_name>.restart
+touch $ROOT/flg/<fly_name>.restart
 ```

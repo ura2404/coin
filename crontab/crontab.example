@@ -1,1 +1,7 @@
 * * * * * cd ~/coin && bash start.bash > /dev/null 2>/dev/null
+
+* * * * * cd ~/coin.new && bash errors.bash > /dev/null 2>/dev/null
+* * * * * cd ~/coin.new && bash temperature.bash > /dev/null 2>/dev/null
+* * * * * sleep 15; cd ~/coin.new && bash temperature.bash > /dev/null 2>/dev/null
+* * * * * sleep 30; cd ~/coin.new && bash temperature.bash > /dev/null 2>/dev/null
+* * * * * sleep 45; cd ~/coin.new && bash temperature.bash > /dev/null 2>/dev/null
