@@ -25,7 +25,6 @@ function def(){
     [ $PL -ne $PDEF ] && sudo $SMI -i $N -pl $PDEF &&  echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(*)def\t\t' $NP 'W' >> $LOG
 }
 
-
 # --- --- --- --- ---
 function up(){
     N=${1}
