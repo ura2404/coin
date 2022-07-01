@@ -13,13 +13,13 @@ find $ROOT/log -name 'watchdog.log' -mtime +10 -delete
 
 # --- --- --- --- ---
 function watch_init(){
-    echo `date +%Y-%m-%d_%H:%M:%S` 'Watchdog init' | tee $LOG
+    echo `date +%Y-%m-%d_%H:%M:%S` 'Watchdog init' | tee -a $LOG
     sudo chmod o+rw $WPORT
     sudo stty 9600 cs8 -parenb crtscts -echo -F $WPORT
 }
 
 function watch(){
-    echo `date +%Y-%m-%d_%H:%M:%S` 'Watchdog check' | tee $LOG
+    echo `date +%Y-%m-%d_%H:%M:%S` 'Watchdog check' | tee -a $LOG
 
     TS=5
     C=12
