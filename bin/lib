@@ -5,15 +5,23 @@
 #    export JQ
 #    export SCREEN
 
+LOG=$ROOT/log/fly.log
+
+# purge log file
+find $ROOT/log -name 'fly.log' -mtime +5 -delete
+
+# --- --- --- --- ---
 function make_start(){
-    SID=$1
-    EXEC=$2
+    ID=$1
+    SID=$2
+    EXEC=$3
 
     INS=`ps aux | grep $SID | grep -v grep`
 
     if [ -z "$INS" ]
     then
         echo 'Start'
+        echo `date +%Y-%m-%d_%H:%M:%S` 'Start' $ID			>> $LOG
         $SCREEN -dmS $SID bash $EXEC
     else
         echo 'Allready started'
@@ -22,13 +30,15 @@ function make_start(){
 }
 
 function make_stop(){
-    SID=$1
+    ID=$1
+    SID=$2
 
     INS=`ps aux | grep $SID | grep -v grep`
 
     if [ -n "$INS" ]
     then
         echo 'Stop'
+        echo `date +%Y-%m-%d_%H:%M:%S` 'Stop' $ID			>> $LOG
         PID=`echo $INS | awk '{print $2}'`
         kill $PID
     else
@@ -37,75 +47,86 @@ function make_stop(){
 }
 
 function make_restart(){
-    SID=$1
-    EXEC=$2
+    ID=$1
+    SID=$2
+    EXEC=$3
 
-    make_stop $SID && make_start $SID $EXEC
+    echo `date +%Y-%m-%d_%H:%M:%S` 'Restart' $ID			>> $LOG
+    make_stop $ID $SID && make_start $ID $SID $EXEC
 }
 
 function make_exec(){
     echo '----------------------------------------'
-    echo 'Check flylists'
+    echo 'Check fly'
 
-    while ((i++)); read flylist; do
-        ID=`echo $flylist | $JQ '.name'  | sed 's/\"//g'`
+    while ((i++)); read fly; do
+        ID=`echo $fly | $JQ '.name'  | sed 's/\"//g'`
         echo '----------------------------------------'
         echo $ID
-
-        ENABLE=`echo $flylist | $JQ '.enable'`
-
-        MINER=`echo $flylist | $JQ '.miner'`
-        MINERA=`cat $ROOT/conf/miners.json | $JQ .$MINER`
-
-        WALLET=`echo $flylist | $JQ '.wallet'`
-        WALLET=`cat $ROOT/conf/wallets.json | $JQ .$WALLET |  $JQ '.wallet' | sed 's/\"//g'`
 
         SID='SCR_COIN_'$i
         EXEC=$ROOT/execs/$i.bash
 
-        MD1=`md5sum $EXEC | awk '{print $1}'`
+        ENABLE=`echo $fly | $JQ '.enable'`
 
-        echo '#!/bin/bash'							>  $EXEC
-        echo 									>> $EXEC
-        echo 'cd '$ROOT'/miners/'`echo $MINERA | $JQ '.folder' | sed 's/\"//g'`	>> $EXEC
-        echo 									>> $EXEC
-        echo 'INDEX='$i								>> $EXEC
-        echo 'INI='$ROOT/execs/$i.ini						>> $EXEC
-        echo 'NAME='`cat $ROOT/conf/rig.json | $JQ '.name' | sed 's/\"//g'`	>> $EXEC
-        echo 'EMAIL='`cat $ROOT/conf/rig.json | $JQ '.email' | sed 's/\"//g'`	>> $EXEC
-        echo 'COIN='`echo $flylist | $JQ '.coin' | sed 's/\"//g'`		>> $EXEC
-        echo 'WALLET='$WALLET							>> $EXEC
-        echo 'IP='`echo $flylist | $JQ '.ip' | sed 's/\"//g'`			>> $EXEC
-        echo 'PORT='`echo $flylist | $JQ '.port' | sed 's/\"//g'`		>> $EXEC
-        echo 'DEVICES='`echo $flylist | $JQ '.devices' | sed 's/\"//g'`		>> $EXEC
-        echo 									>> $EXEC
+        MINER=`echo $fly | $JQ '.miner'`
+        MINERA=`cat $ROOT/conf/miners.json | $JQ .$MINER`
 
-        echo $MINERA | $JQ '.exec' | $JQ -c '.[]' | while read -r rec
-        do
-            echo $rec  | sed 's/\"//g' >> $EXEC
-        done
-        MD2=`md5sum $EXEC | awk '{print $1}'`
+        WALLET=`echo $fly | $JQ '.wallet'`
+        WALLET=`cat $ROOT/conf/wallets.json | $JQ .$WALLET |  $JQ '.wallet' | sed 's/\"//g'`
 
-        chmod 700 $EXEC
+        # --- --- --- --- ---
+        #echo 'WALLET='$WALLET
+        #echo 'MINERA='$MINERA
 
-        if [ $ENABLE == 'true' ]
+        if [ "$MINERA" == 'null' ] || [ "$WALLET" == 'null' ];
         then
-            if [ -e "$ROOT/flg/$ID.restart" ]
+            make_stop $ID $SID
+        else
+            MD1=`md5sum $EXEC | awk '{print $1}'`
+
+            echo '#!/bin/bash'								>  $EXEC
+            echo 									>> $EXEC
+            echo 'cd '$ROOT'/miners/'`echo $MINERA | $JQ '.folder' | sed 's/\"//g'`	>> $EXEC
+            echo 									>> $EXEC
+            echo 'INDEX='$i								>> $EXEC
+            echo 'INI='$ROOT/execs/$i.ini						>> $EXEC
+            echo 'NAME='`cat $ROOT/conf/rig.json | $JQ '.name' | sed 's/\"//g'`		>> $EXEC
+            echo 'EMAIL='`cat $ROOT/conf/rig.json | $JQ '.email' | sed 's/\"//g'`	>> $EXEC
+            echo 'COIN='`echo $fly | $JQ '.coin' | sed 's/\"//g'`			>> $EXEC
+            echo 'WALLET='$WALLET							>> $EXEC
+            echo 'IP='`echo $fly | $JQ '.ip' | sed 's/\"//g'`				>> $EXEC
+            echo 'PORT='`echo $fly | $JQ '.port' | sed 's/\"//g'`			>> $EXEC
+            echo 'DEVICES='`echo $fly | $JQ '.devices' | sed 's/\"//g'`			>> $EXEC
+            echo 									>> $EXEC
+
+            echo $MINERA | $JQ '.exec' | $JQ -c '.[]' | while read -r rec
+            do
+                echo $rec  | sed 's/\"//g'						>> $EXEC
+            done
+            chmod 700 $EXEC
+
+            MD2=`md5sum $EXEC | awk '{print $1}'`
+
+            if [ $ENABLE == 'true' ];
             then
-                echo 'Restart by flag'
-                rm -f $ROOT/flg/$ID.restart
-                make_restart $SID $EXEC
-            else
-                if [ "$MD1" != "$MD2" ]
+                if [ -e "$ROOT/flg/$ID.restart" ]
                 then
-                    echo 'Restart by change fly file'
+                    echo 'Restart by flag'
+                    rm -f $ROOT/flg/$ID.restart
                     make_restart $SID $EXEC
                 else
-                    make_start $SID $EXEC
+                    if [ "$MD1" != "$MD2" ]
+                    then
+                        echo 'Restart by change fly file'
+                        make_restart $ID $SID $EXEC
+                    else
+                        make_start $ID $SID $EXEC
+                    fi
                 fi
+            else
+                make_stop $ID $SID
             fi
-        else
-            make_stop $SID
         fi
 
     done

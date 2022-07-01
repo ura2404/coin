@@ -1,0 +1,31 @@
+#!/bin/bash
+
+export WPORT=`cat $ROOT/conf/watchdog.json | $JQ .port | sed 's/\"//g'`
+export WTO=`cat $ROOT/conf/watchdog.json | $JQ .timeout | sed 's/\"//g'`
+
+LOG=$ROOT/log/watchdog.log
+
+#echo 'WPORT='$WPORT
+#echo 'WPORT='$WTO
+
+# purge log file
+find $ROOT/log -name 'watchdog.log' -mtime +10 -delete
+
+# --- --- --- --- ---
+function watch_init(){
+    echo `date +%Y-%m-%d_%H:%M:%S` 'Watchdog init' | tee $LOG
+    sudo chmod o+rw $WPORT
+    sudo stty 9600 cs8 -parenb crtscts -echo -F $WPORT
+}
+
+function watch(){
+    echo `date +%Y-%m-%d_%H:%M:%S` 'Watchdog check' | tee $LOG
+
+    TS=5
+    C=12
+    while [ $C -gt 0 ]
+    do
+        sleep $TS; sudo echo -e '\x0D' > $WPORT
+        C=$[ $C - 1 ]
+    done
+}

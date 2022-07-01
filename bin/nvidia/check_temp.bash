@@ -4,12 +4,19 @@ echo '----------------------------------------'
 echo 'Check nvidia temperature'
 
 LOG=$ROOT/log/nvidia_temp.log
+TEMP=$ROOT/conf/temp.json
+
+TALL=`cat $TEMP | $JQ '.all'`
+echo 'TALL='$TALL
 
 # need temp
-TN=66
+#TN=66
 
 # запас до мах power limit
 DMAX=2
+
+# purge log file
+find $ROOT/log -name 'nvidia_temp.log' -mtime +1 -delete
 
 # --- --- --- --- ---
 function def(){
@@ -89,6 +96,15 @@ $SMI dmon -c 1 | grep -v '#' | while read a; do
     #echo $PL-$PDEF-$PMIN-$PMAX
 
     # def $N
+
+    echo "$N"
+    #TN=`cat $TEMP | $JQ 'map(select(.))|.['$N']'`
+    TN=`cat $TEMP | $JQ '.v'$N`
+    [ $TN == 'null' ] && TN=$TALL
+    echo 'TN='$TN
+
+#cat raw.json|jq -r -c 'map(select(.a=="x"))|.[1]'
+#( map(select(.a == "x")) | nth(1) )
 
     [ $T -le $(( TN - 1 )) ] && up $N $T
     [ $T -ge $(( TN + 1 )) ] && down $N $T

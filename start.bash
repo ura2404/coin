@@ -8,4 +8,4 @@ export SCREEN=`which screen`
 
 #echo $ROOT >> $ROOT/log/log
 
-cat $ROOT/conf/flylists.json | $JQ '.[] | tostring' | sed 's/^\"//;s/\"$//' | make_exec
+cat $ROOT/conf/fly.json | $JQ '.[] | tostring' | sed 's/^\"//;s/\"$//' | make_exec
