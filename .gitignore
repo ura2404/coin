@@ -3,4 +3,5 @@ flg/*
 tmp/*
 execs/*.*
 log/*
+*.log
 !.gitkeep
