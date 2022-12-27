@@ -1,0 +1,53 @@
+2022-Jul-05 12:48:10:                                    _                 
+2022-Jul-05 12:48:10:  _ __   __ _ _ __   ___  _ __ ___ (_)_ __   ___ _ __ 
+2022-Jul-05 12:48:10: | '_ \ / _` | '_ \ / _ \| '_ ` _ \| | '_ \ / _ \ '__|
+2022-Jul-05 12:48:10: | | | | (_| | | | | (_) | | | | | | | | | |  __/ |   
+2022-Jul-05 12:48:10: |_| |_|\__,_|_| |_|\___/|_| |_| |_|_|_| |_|\___|_|   
+2022-Jul-05 12:48:10: 
+2022-Jul-05 12:48:10: Version 3.6.7-cuda11-linux
+2022-Jul-05 12:48:10: Started EthMan server on port 3333 without a password (read-only mode).
+2022-Jul-05 12:48:10: Started web interface on port 9090 without a password.
+2022-Jul-05 12:48:10: CUDA driver version is 11.2, runtime version is 11.1
+2022-Jul-05 12:48:10: NVIDIA driver version: 460.91.03
+2022-Jul-05 12:48:10: Detected 6 devices
+2022-Jul-05 12:48:10: GPU 0 PCI 01:00.0, Platform: CUDA, Name: GeForce GTX 1050 Ti, 4040 MB available
+2022-Jul-05 12:48:10: GPU 1 PCI 03:00.0, Platform: CUDA, Name: P106-100, 6080 MB available
+2022-Jul-05 12:48:10: GPU 2 PCI 04:00.0, Platform: CUDA, Name: GeForce GTX 1050 Ti, 4040 MB available
+2022-Jul-05 12:48:10: GPU 3 PCI 05:00.0, Platform: CUDA, Name: GeForce GTX 1050 Ti, 4040 MB available
+2022-Jul-05 12:48:10: GPU 4 PCI 06:00.0, Platform: CUDA, Name: GeForce GTX 1050 Ti, 4040 MB available
+2022-Jul-05 12:48:10: GPU 5 PCI 07:00.0, Platform: CUDA, Name: GeForce GTX 1060 6GB, 6078 MB available
+2022-Jul-05 12:48:10: -------------------Ethash:------------------
+2022-Jul-05 12:48:10: Currency: Ethereum
+2022-Jul-05 12:48:10: Wallet: 0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5
+2022-Jul-05 12:48:10: Rig name: Doc_8c282727
+2022-Jul-05 12:48:10: Email was not set.
+2022-Jul-05 12:48:10: Hashrate threshold to restart miner is not set
+2022-Jul-05 12:48:10: Number of rejected shares per hour to restart miner is not set
+2022-Jul-05 12:48:10: Added pool: eth-eu2.nanopool.org:9433
+2022-Jul-05 12:48:10: Added pool: eth-eu1.nanopool.org:9433
+2022-Jul-05 12:48:10: Added pool: eth-us-east1.nanopool.org:9433
+2022-Jul-05 12:48:10: Added pool: eth-us-west1.nanopool.org:9433
+2022-Jul-05 12:48:10: Added pool: eth-asia1.nanopool.org:9433
+2022-Jul-05 12:48:10: Added pool: eth-jp1.nanopool.org:9433
+2022-Jul-05 12:48:10: Added pool: eth-au1.nanopool.org:9433
+2022-Jul-05 12:48:10: Auto pool sorting is enabled
+2022-Jul-05 12:48:10: Using all GPU devices
+2022-Jul-05 12:48:10: Memory tweak: 1,1,1,1,1,1
+2022-Jul-05 12:48:10: -------------Common parameters:-------------
+2022-Jul-05 12:48:10: Log path: ./logs/
+2022-Jul-05 12:48:10: Log is written to file
+2022-Jul-05 12:48:10: GPU watchdog is enabled
+2022-Jul-05 12:48:10: Never calling reboot.sh (always restarting the miner in case of errors). 
+2022-Jul-05 12:48:10: Setting up algorithm: Ethash
+2022-Jul-05 12:48:10: -----------------------------------------------------------
+2022-Jul-05 12:48:10: | You are mining to a default wallet! Change it to yours! |
+2022-Jul-05 12:48:10: -----------------------------------------------------------
+2022-Jul-05 12:48:10: Connecting to pools...
+2022-Jul-05 12:48:10: Connected to pool: eth-eu2.nanopool.org:9433 | IP: 51.255.34.79 | ping: 302 ms.
+2022-Jul-05 12:48:10: New job from eth-eu2.nanopool.org:9433 | share difficulty = 10 GH, epoch 502 (5039 MB)
+2022-Jul-05 12:48:10: New job from eth-eu2.nanopool.org:9433
+2022-Jul-05 12:48:11: New job from eth-eu2.nanopool.org:9433
+2022-Jul-05 12:48:12: New job from eth-eu2.nanopool.org:9433
+2022-Jul-05 12:48:13: New job from eth-eu2.nanopool.org:9433
+2022-Jul-05 12:48:13: New job from eth-eu2.nanopool.org:9433
+2022-Jul-05 12:48:13: New job from eth-eu2.nanopool.org:9433

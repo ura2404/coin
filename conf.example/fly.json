@@ -1,0 +1,32 @@
+[
+    {
+        "enable" : false,
+        "name" : "RVN_BITTREX",
+        "miner" : "nanominer",
+        "coin" : "rvn",
+        "wallet" : "RVN_Bitrex",
+        "ip" : "0.0.0.0",
+        "port" : "3335",
+        "devices" : "0,1,2,3,4,5"
+    },
+    {
+        "enable" : false,
+        "name" : "SERO_GATEIO",
+        "miner" : "t-rex_sero",
+        "coin" : "sero",
+        "wallet" : "SERO_Gate.io",
+        "ip" : "0.0.0.0",
+        "port" : "4067",
+        "devices" : "0,1,2,3,4,5"
+    },
+    {
+        "enable" : true,
+        "name" : "ZANO_LOCAL",
+        "miner" : "t-rex_zano",
+        "coin" : "zano",
+        "wallet" : "ZANO_local",
+        "ip" : "0.0.0.0",
+        "port" : "4067",
+        "devices" : "0,1,2,3,4,5"
+    }
+]

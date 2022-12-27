@@ -1,0 +1,11 @@
+2022-Jun-29 12:55:48:                                    _                 
+2022-Jun-29 12:55:48:  _ __   __ _ _ __   ___  _ __ ___ (_)_ __   ___ _ __ 
+2022-Jun-29 12:55:48: | '_ \ / _` | '_ \ / _ \| '_ ` _ \| | '_ \ / _ \ '__|
+2022-Jun-29 12:55:48: | | | | (_| | | | | (_) | | | | | | | | | |  __/ |   
+2022-Jun-29 12:55:48: |_| |_|\__,_|_| |_|\___/|_| |_| |_|_|_| |_|\___|_|   
+2022-Jun-29 12:55:48: 
+2022-Jun-29 12:55:48: Version 3.5.2-cuda11
+2022-Jun-29 12:55:48: The configuration file does not contain any wallets or they are invalid!
+2022-Jun-29 12:55:48: Minimal configuration file for Ethereum mining is "wallet=<your Ethereum wallet>".
+2022-Jun-29 12:55:48: Minimal command line options for Ethereum mining is "-wallet <your Ethereum wallet>".
+2022-Jun-29 12:55:48: See ReadMe document for detailed information.

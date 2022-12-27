@@ -1,0 +1,35 @@
+{
+    "ZANO_local" : {
+        "wallet": "ZxBohn6c9MhRCuHHo8JHbo8bYeDG7NWkD8fbrYatNG2MU54FrUPpeXADBfAvw3J4KpMKdg2jWuuMFRBwo42Uz3gB1e7vcAk1q"
+    },
+
+
+    "ETH_Poloniex" : {
+        "wallet" : "0xcafce3e6a53c9a1682131726b00727fc0d3a5bc7"
+    },
+    "ETH_Bitrex" : {
+        "wallet" : "0x98158acedcaa25b16b5de146e4d7cb4928b79701"
+    },
+    "ETC_Bitrex" : {
+        "wallet" : "0xf4a0e55547f013be4e22201cd6035b7d3a922bcc"
+    },
+    "PASC_Poloniex" : {
+        "wallet" : "86646-64",
+        "payload" : "6c7412e4c4914b40"
+    },
+    "SIA_Bitrex" : {
+        "wallet" : "d7c2efd3af555dbb718f0f3f64768d2f5565f91afbe7c59e03622365ae3e78c2692dad2e0c0f"
+    },
+    "RVN_Bitrex" : {
+        "wallet" : "REH4AAhHSQidXddxv1JcCxVLjnsCdCdb4v"
+    },
+    "XMR_Bitrex" : {
+        "wallet" : "892Fsr7iGwkd1AWYowUiDMd28NMqKY1Z3RcSUsrU5xnRfG8zT5jBpT58DZusmx5Gv3aup2kjkfWmXHmVevJBvEPuSHXXD3c"
+    },
+    "ERG_Kucoin" : {
+        "wallet" : "9i2JfiW9Uw8ufyUoo1hWYHJA6aVzFxzNrStLhYRwCZR6srBynnU"
+    },
+    "SERO_Gate.io": {
+        "wallet" : "2CdAhAar9nWECZqebKNS9b9JJYAoSbFaywocy8TaogAuYYPghidYWQ2J9FBcpXrrsD6bN14nS7dCvYLCPYV9XizVdEd1zpe55cZFLHzRYxmxkurjqhBufbt6hfZRjzWH7gCx"
+    }
+}

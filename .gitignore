@@ -1,7 +1,6 @@
 conf/*
 flg/*
 tmp/*
-miners/*
 execs/*.*
 log/*
 !.gitkeep

@@ -1,0 +1,29 @@
+{
+    "nanominer" : {
+        "folder" : "nanominer-linux-3.6.7-cuda11",
+        "exec" : [
+            "echo 'wallet = '$WALLET > $INI",
+            "echo 'coin = '$COIN >> $INI",
+            "echo 'rigName = '$NAME >> $INI",
+            "echo 'email = '$EMAIL >> $INI",
+            "echo 'devices = '$DEVICES >> $INI",
+            "echo 'mport = '$PORT >> $INI",
+            "echo 'noLog = true' >> $INI",
+            "./nanominer $INI"
+        ]
+    },
+
+    "t-rex_sero" : {
+        "folder" : "t-rex-0.26.8-linux",
+        "exec" : [
+            "./t-rex -a progpow --coin sero -o stratum+tcp://pool2.sero.cash:8808 -u $WALLET -p x -w $NAME --api-bind-http $IP:$PORT -d $DEVICES"
+        ]
+    },
+
+    "t-rex_zano" : {
+        "folder" : "t-rex-0.26.8-linux",
+        "exec" : [
+            "./t-rex -a progpowz -o stratum+tcp://zano.luckypool.io:8877 -u $WALLET -p x -w $NAME --api-bind-http $IP:$PORT -d $DEVICES"
+        ]
+    }
+}
