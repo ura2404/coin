@@ -9,6 +9,7 @@ Coin project for debian based system
   * nvidia-cuda-toolkit
   * screen
   * jq
+  *
 
 For restart
 ```
