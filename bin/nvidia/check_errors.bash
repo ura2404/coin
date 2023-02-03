@@ -27,6 +27,7 @@ else
     if [ "$N" != "$COUNT" ]
     then
         echo `date +%Y-%m-%d_%H:%M:%S` 'Reboot by wrong GPU count ('$COUNT')' | tee -a $LOG
+        nvidia-smi | tee -a $LOG
         sudo reboot
     else
         echo 'Errors not found' >> /dev/null
