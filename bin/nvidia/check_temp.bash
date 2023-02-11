@@ -16,7 +16,15 @@ echo 'TALL='$TALL
 DMAX=2
 
 # purge log file
-find $ROOT/log -name 'nvidia_temp.log' -mtime +1 -delete
+#find $ROOT/log -name 'nvidia_temp.log' -mtime +1 -delete
+TRUN=`cat $ROOT/conf/log.json | $JQ '.truncate' | $JQ '.temp' | sed 's/\"//g'`
+if [ -e "$ROOT/flg/tr_temp.flg" ]
+then
+    rm -f $ROOT/flg/tr_temp.flg
+    tail $LOG -n $TRUN > $LOG'1'
+    mv $LOG'1' $LOG
+fi
+
 
 # --- --- --- --- ---
 function def(){

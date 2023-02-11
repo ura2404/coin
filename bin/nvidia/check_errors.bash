@@ -9,7 +9,16 @@ LOG=$ROOT/log/nvidia_err.log
 ERR1='Reboot the system to recover this GPU'
 
 # purge log file
-find $ROOT/log -name 'nvidia_err.log' -mtime +10 -delete
+#find $ROOT/log -name 'nvidia_err.log' -mtime +10 -delete
+TRUN=`cat $ROOT/conf/log.json | $JQ '.truncate' | $JQ '.err' | sed 's/\"//g'`
+if [ -e "$ROOT/flg/tr_err.flg" ]
+then
+    rm -f $ROOT/flg/tr_err.flg
+    tail $LOG -n $TRUN > $LOG'1'
+    mv $LOG'1' $LOG
+fi
+
+
 
 #
 N=`cat $ROOT/conf/nvidia.json | $JQ '.total' | sed 's/\"//g'`

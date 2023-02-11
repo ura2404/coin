@@ -8,3 +8,8 @@
 
 @reboot   cd ~/coin.new && bash watchdog.bash init > /dev/null 2>/dev/null
 * * * * * cd ~/coin.new && bash watchdog.bash > /dev/null 2>/dev/null
+
+*/2 * * * * cd ~/coin.new && touch flg/tr_err.flg
+*/2 * * * * cd ~/coin.new && touch flg/tr_temp.flg
+*/2 * * * * cd ~/coin.new && touch flg/tr_wdog.flg
+*/2 * * * * cd ~/coin.new && touch flg/tr_fly.flg

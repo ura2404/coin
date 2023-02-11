@@ -9,7 +9,16 @@ LOG=$ROOT/log/watchdog.log
 #echo 'WPORT='$WTO
 
 # purge log file
-find $ROOT/log -name 'watchdog.log' -mtime +10 -delete
+#find $ROOT/log -name 'watchdog.log' -mtime +10 -delete
+TRUN=`cat $ROOT/conf/log.json | $JQ '.truncate' | $JQ '.wdog' | sed 's/\"//g'`
+if [ -e "$ROOT/flg/tr_wdog.flg" ]
+then
+    rm -f $ROOT/flg/tr_wdog.flg
+    tail $LOG -n $TRUN > $LOG'1'
+    mv $LOG'1' $LOG
+fi
+
+
 
 # --- --- --- --- ---
 function watch_init(){
