@@ -9,7 +9,7 @@ LOG=$ROOT/log/nvidia_temp.log	# лог-файл
 TEMP=$ROOT/conf/temp.json	# температурные настройки
 LAST=$ROOT/tmp			# папка сохранения последнего PL
 DMAX=1				# запас до мах power limit
-UPLIM=`cat $TEMP | $JQ 'max'`	# естанавливать PL сверх defaut
+UPLIM=`cat $TEMP | $JQ '.max'`	# естанавливать PL сверх defaut
 echo $UPLIM
 
 
@@ -65,7 +65,9 @@ function up(){
     NP=$(( PL+1 ))
 
     # если температура больше температуры по умолчанию, то ничего не делать
+    if [ "$UPLIM" != "true" ]; then
     [ $NP -gt $PDEF ] && echo 'pl=MAX do nothing' && return
+    fi
 
     # если температура больше, чем максимальный минус запас (см. выше), то ничего не делать
     [ $NP -gt $(( PMAX - DMAX )) ] && echo 'pl > MAX-DMAX do nothing' && return
