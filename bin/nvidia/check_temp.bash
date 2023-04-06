@@ -3,18 +3,28 @@
 echo '----------------------------------------'
 echo 'Check nvidia temperature'
 
-LOG=$ROOT/log/nvidia_temp.log
-TEMP=$ROOT/conf/temp.json
+# --- --- --- --- ---
+# настройки
+LOG=$ROOT/log/nvidia_temp.log	# лог-файл
+TEMP=$ROOT/conf/temp.json	# температурные настройки
+LAST=$ROOT/tmp			# папка сохранения последнего PL
+DMAX=1				# запас до мах power limit
+UPLIM=`cat $TEMP | $JQ 'max'`	# естанавливать PL сверх defaut
+echo $UPLIM
 
+
+# --- --- --- --- ---
+# работать, только если запущен майнер
+PID=`ps aux | grep -e 'SCREEN' -e 'COIN' | grep -v grep`
+#echo 'PID='$PID
+[ -z "$PID" ] && exit
+
+# --- --- --- --- ---
+# получить температуру по умолчанию
 TALL=`cat $TEMP | $JQ '.all'`
 echo 'TALL='$TALL
 
-# need temp
-#TN=66
-
-# запас до мах power limit
-DMAX=2
-
+# --- --- --- --- ---
 # purge log file
 #find $ROOT/log -name 'nvidia_temp.log' -mtime +1 -delete
 TRUN=`cat $ROOT/conf/log.json | $JQ '.truncate' | $JQ '.temp' | sed 's/\"//g'`
@@ -30,7 +40,7 @@ fi
 function def(){
     N=${1}	# номер GPU
     T=${2}	# текущая температура
-    echo $N 'def'
+    echo 'make def'
 
     S=`$SMI -i $N --format=csv,noheader --query-gpu=power.limit,power.default_limit`
     PL=`echo $S | cut -d ',' -f1 | cut -d ' ' -f1 | cut -d '.' -f1`		# текущий PL
@@ -44,7 +54,7 @@ function def(){
 function up(){
     N=${1}	# номер GPU
     T=${2}	# текущая температура
-    echo $N 'up'
+    echo 'make up'
 
     S=`$SMI -i $N --format=csv,noheader --query-gpu=power.limit,power.default_limit,power.max_limit`
     PL=`echo $S | cut -d ',' -f1 | cut -d ' ' -f1 | cut -d '.' -f1`		# текущий PL
@@ -54,18 +64,24 @@ function up(){
     # устанавливаемый PL
     NP=$(( PL+1 ))
 
-    # если температура больше температуры по умолчанию - ничего не делать
-    [ $NP -gt $PDEF ] && return
+    # если температура больше температуры по умолчанию, то ничего не делать
+    [ $NP -gt $PDEF ] && echo 'pl=MAX do nothing' && return
 
-    # если температура меньше, чем максимальный минус запас (см. выше), то установитьб желаемый
-    [ $NP -lt $(( PMAX - DMAX )) ] && sudo $SMI -i $N -pl $NP && echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(^)up\t\t'$PL 'W -> '$NP 'W' >> $LOG
+    # если температура больше, чем максимальный минус запас (см. выше), то ничего не делать
+    [ $NP -gt $(( PMAX - DMAX )) ] && echo 'pl > MAX-DMAX do nothing' && return
+
+    # установить PL
+    sudo $SMI -i $N -pl $NP && echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(^)up\t\t'$PL 'W -> '$NP 'W' >> $LOG
+
+    # сохранить PL
+    echo $NP > $LAST/pl_$N
 }
 
 # --- --- --- --- ---
 function down(){
     N=${1}	# номер GPU
     T=${2}	# текущая температура
-    echo $N 'down'
+    echo 'make down'
 
     S=`$SMI -i $N --format=csv,noheader --query-gpu=power.limit,power.min_limit`
     PL=`echo $S | cut -d ',' -f1 | cut -d ' ' -f1 | cut -d '.' -f1`		# текущий PL
@@ -74,23 +90,19 @@ function down(){
     # устанавливаемый PL
     NP=$(( PL-1 ))
 
-    # если температура больше, чем минимальный, то установитьб желаемый
-    [ $PL -gt $(( PMIN +0 )) ] && sudo $SMI -i $N -pl $NP &&  echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(v)down\t\t'$PL 'W -> '$NP 'W' >> $LOG
+    # если желаемая температура меньше ,чем минимальный, то ничего не делать
+    [ $NP -lt $(( PMIN + 1 )) ] && echo "pl < MIN($PMIN) do nothing" && return
+
+    # установить PL
+    sudo $SMI -i $N -pl $NP &&  echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(v)down\t\t'$PL 'W -> '$NP 'W' >> $LOG
+
+    # сохранить PL
+    echo $NP > $LAST/pl_$N
 }
 
 # --- --- --- --- --- --- --- --- ---
 # --- --- --- --- --- --- --- --- ---
 # --- --- --- --- --- --- --- --- ---
-
-# purge log file
-find $ROOT/log -name 'nvidia_temp.log' -mtime +1 -delete
-
-# работать, только если запущен майнер
-PID=`ps aux | grep -e 'SCREEN' -e 'COIN' | grep -v grep`
-#echo 'PID='$PID
-
-[ -z "$PID" ] && exit
-
 # перебираем gpu
 $SMI dmon -c 1 | grep -v '#' | while read a; do
     N=`echo $a | awk '{ print $1 }'`	# номер GPU
@@ -110,10 +122,13 @@ $SMI dmon -c 1 | grep -v '#' | while read a; do
 
     # def $N
 
-    echo "$N"
     #TN=`cat $TEMP | $JQ 'map(select(.))|.['$N']'`
-    TN=`cat $TEMP | $JQ '.v'$N`				# желаемая температура (из конфига)
+    TN=`cat $TEMP | $JQ '.t'$N`				# желаемая температура (из конфига)
     [ $TN == 'null' ] && TN=$TALL
+
+    echo '--------'
+    echo "N=$N"
+    echo "TC=$T"
     echo 'TN='$TN
 
     #cat raw.json|jq -r -c 'map(select(.a=="x"))|.[1]'
@@ -126,7 +141,4 @@ $SMI dmon -c 1 | grep -v '#' | while read a; do
     else
         def $N $T
     fi
-
-    [ $T -le $(( TN - 1 )) ] && up $N $T
-    [ $T -ge $(( TN + 1 )) ] && down $N $T
 done
