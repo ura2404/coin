@@ -1,10 +1,8 @@
 #!/bin/bash
 
-export ROOT=`pwd`
-export JQ=`which jq`
+DSRC=$(dirname $(realpath $BASH_SOURCE))
+source $DSRC/env.sh
 
-. $ROOT/bin/watchdog/tishric
-
+source $ROOT/bin/watchdog/tishric
 [ "$1" == "init" ] && watch_init && exit
-
 watch

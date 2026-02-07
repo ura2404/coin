@@ -1,9 +1,8 @@
 #!/bin/bash
 
-export ROOT=`pwd`
-export SMI=`which nvidia-smi`
-export JQ=`which jq`
+DSRC=$(dirname $(realpath $BASH_SOURCE))
+source $DSRC/env.sh
 
 export DEF=$1
 
-bash bin/nvidia/check_temp.bash $DEF
+bash $ROOT/bin/nvidia/check_temp.bash $DEF

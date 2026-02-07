@@ -18,11 +18,10 @@ then
     mv $LOG'1' $LOG
 fi
 
-
-
-#
+# ------------------------------------------------------------------------------
 N=`cat $ROOT/conf/nvidia.json | $JQ '.total' | sed 's/\"//g'`
 COUNT=`$SMI --format=csv --query-gpu=index | sed '1d' | wc -l`
+# echo $N $COUNT
 
 RET=`$SMI --format=csv --query-gpu=index`
 
@@ -37,9 +36,10 @@ else
     then
         echo `date +%Y-%m-%d_%H:%M:%S` 'Reboot by wrong GPU count ('$COUNT')' | tee -a $LOG
         nvidia-smi | tee -a $LOG
+        touch $ROOT/flg/reboot.flg
         sudo reboot
     else
         echo 'Errors not found' >> /dev/null
+        touch $ROOT/flg/nvidia-ok.flg
     fi
 fi
-

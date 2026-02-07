@@ -28,13 +28,19 @@ function watch_init(){
 }
 
 function watch(){
-    echo `date +%Y-%m-%d_%H:%M:%S` 'Watchdog check' | tee -a $LOG
+    echo `date +%Y-%m-%d_%H:%M:%S` 'Watchdog ping' | tee -a $LOG
+    # sudo echo -e '\x0D' > $WPORT && echo "ping to $WPORT" | tee -a $LOG
 
-    TS=5
-    C=12
+    TS=5 # пауза
+    C=12 # кол-во
     while [ $C -gt 0 ]
     do
-        sleep $TS; sudo echo -e '\x0D' > $WPORT
-        C=$[ $C - 1 ]
+        echo "iter $C"
+        (
+            [ ! -f $ROOT/flg/reboot.flg ] &&                   # нет флага перезагрузки
+            ! find flg/nvidia-ok.flg -mmin +2 | grep -q .      # нет флага проверки nvidia младше 2 минут
+        ) && sleep $TS && echo "ping $C" >> $LOG  && sudo echo -e '\x0D' > $WPORT
+
+        C=$((C - 1))
     done
 }

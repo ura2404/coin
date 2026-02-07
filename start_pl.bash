@@ -1,7 +1,6 @@
 #!/bin/bash
 
-export ROOT=`pwd`
-export SMI=`which nvidia-smi`
-export JQ=`which jq`
+DSRC=$(dirname $(realpath $BASH_SOURCE))
+source $DSRC/env.sh
 
-bash bin/nvidia/start_pl.bash
+bash $ROOT/bin/nvidia/start_pl.bash

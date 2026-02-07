@@ -3,28 +3,29 @@
 echo '----------------------------------------'
 echo 'Check nvidia temperature'
 
+JQ=`which jq`
+
 # --- --- --- --- ---
 # настройки
 LOG=$ROOT/log/nvidia_temp.log	# лог-файл
 TEMP=$ROOT/conf/temp.json	# температурные настройки
 LAST=$ROOT/tmp			# папка сохранения последнего PL
 DMAX=1				# запас до мах power limit
-UPLIM=`cat $TEMP | $JQ '.max'`	# естанавливать PL сверх defaut
-echo $UPLIM
+UPLIM=`cat $TEMP | $JQ '.uplim'`	# устанавливать PL сверх defaut
+# echo $UPLIM
 
-
-# --- --- --- --- ---
+# ------------------------------------------------------------------------------
 # работать, только если запущен майнер
 PID=`ps aux | grep -e 'SCREEN' -e 'COIN' | grep -v grep`
 #echo 'PID='$PID
 [ -z "$PID" ] && exit
 
-# --- --- --- --- ---
+# ------------------------------------------------------------------------------
 # получить температуру по умолчанию
 TALL=`cat $TEMP | $JQ '.all'`
 echo 'TALL='$TALL
 
-# --- --- --- --- ---
+# ------------------------------------------------------------------------------
 # purge log file
 #find $ROOT/log -name 'nvidia_temp.log' -mtime +1 -delete
 TRUN=`cat $ROOT/conf/log.json | $JQ '.truncate' | $JQ '.temp' | sed 's/\"//g'`
@@ -35,8 +36,7 @@ then
     mv $LOG'1' $LOG
 fi
 
-
-# --- --- --- --- ---
+# ------------------------------------------------------------------------------
 function def(){
     N=${1}	# номер GPU
     T=${2}	# текущая температура
@@ -47,10 +47,10 @@ function def(){
     PDEF=`echo $S | cut -d ',' -f2 | cut -d ' ' -f2 | cut -d '.' -f1`		# PL по умолчанию
     #echo $PL---$PDEF
 
-    [ $PL -ne $PDEF ] && sudo $SMI -i $N -pl $PDEF &&  echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(*)def\t\t' $NP 'W' >> $LOG
+    [ $PL -ne $PDEF ] && sudo $SMI -i $N -pl $PDEF && export DLOG=1 && echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(*)def\t\t' $NP 'W' >> $LOG
 }
 
-# --- --- --- --- ---
+# ------------------------------------------------------------------------------
 function up(){
     N=${1}	# номер GPU
     T=${2}	# текущая температура
@@ -73,13 +73,13 @@ function up(){
     [ $NP -gt $(( PMAX - DMAX )) ] && echo 'pl > MAX-DMAX do nothing' && return
 
     # установить PL
-    sudo $SMI -i $N -pl $NP && echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(^)up\t\t'$PL 'W -> '$NP 'W' >> $LOG
+    sudo $SMI -i $N -pl $NP && export DLOG=1 && echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(^)up\t\t'$PL 'W -> '$NP 'W' >> $LOG
 
     # сохранить PL
     echo $NP > $LAST/pl_$N
 }
 
-# --- --- --- --- ---
+# ------------------------------------------------------------------------------
 function down(){
     N=${1}	# номер GPU
     T=${2}	# текущая температура
@@ -93,20 +93,20 @@ function down(){
     NP=$(( PL-1 ))
 
     # если желаемая температура меньше ,чем минимальный, то ничего не делать
-    [ $NP -lt $(( PMIN + 1 )) ] && echo "pl < MIN($PMIN) do nothing" && return
+    [ $NP -lt $(( PMIN + 0 )) ] && echo "pl < MIN($PMIN) do nothing" && return
 
     # установить PL
-    sudo $SMI -i $N -pl $NP &&  echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(v)down\t\t'$PL 'W -> '$NP 'W' >> $LOG
+    sudo $SMI -i $N -pl $NP && export DLOG=1 && echo -e `date +%Y-%m-%d_%H:%M:%S`'\tNo.'$N'\t'$T'\xc2\xb0\t(v)down\t\t'$PL 'W -> '$NP 'W' >> $LOG
 
     # сохранить PL
     echo $NP > $LAST/pl_$N
 }
 
-# --- --- --- --- --- --- --- --- ---
-# --- --- --- --- --- --- --- --- ---
-# --- --- --- --- --- --- --- --- ---
+# ------------------------------------------------------------------------------
 # перебираем gpu
-$SMI dmon -c 1 | grep -v '#' | while read a; do
+# DLOG=0
+#$SMI dmon -c 1 | grep -v '#' | while read a; do
+while read a; do
     N=`echo $a | awk '{ print $1 }'`	# номер GPU
     T=`echo $a | awk '{ print $3 }'`	# текущая температура GPU
 
@@ -143,4 +143,7 @@ $SMI dmon -c 1 | grep -v '#' | while read a; do
     else
         def $N $T
     fi
-done
+# done
+done < <($SMI dmon -c 1 | grep -v '#')
+
+[ $DLOG -eq 1 ] && DLOG=0 && echo >> $LOG
